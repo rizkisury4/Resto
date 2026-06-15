@@ -70,6 +70,9 @@
     <div class="page">
         <header>
             <h1>Daftar Pesanan</h1>
+            @isset($customerContext)
+                <p style="margin:10px 0 0; color:#6d6057;">Menampilkan pesanan untuk {{ $customerContext['customer_name'] }}.</p>
+            @endisset
             <a class="back-link" href="{{ route('menu') }}">Kembali ke Menu</a>
         </header>
 

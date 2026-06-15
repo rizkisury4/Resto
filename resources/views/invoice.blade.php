@@ -5,18 +5,30 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Invoice - Order {{ $order->id }}</title>
     <style>
-        body{font-family: 'Courier New', monospace; max-width:360px;margin:0 auto;color:#111}
+        body{font-family: 'Courier New', monospace; max-width:380px;margin:0 auto;color:#111;padding:12px}
         .center{text-align:center}
         .muted{color:#666;font-size:12px}
         .line{border-top:1px solid #ddd;margin:12px 0}
         .row{display:flex;justify-content:space-between}
         .bold{font-weight:700}
         .item{margin:6px 0}
+        .actions{display:flex;gap:10px;justify-content:center;margin:16px 0 8px}
+        .button{display:inline-block;padding:10px 14px;border-radius:10px;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700}
+        .button-primary{background:#b53f2e;color:#fff}
+        .button-secondary{background:#f2e7df;color:#8f2f1d}
     </style>
 </head>
 <body>
     @unless($forPdf ?? false)
-    <div style="text-align:center;margin-top:8px;margin-bottom:8px">
+    <div class="actions">
+        <a class="button button-secondary" href="{{ route('menu') }}">Home</a>
+        @if($order->status === 'paid' || $order->status === 'completed' || $order->payment_method === 'cashier')
+            <a class="button button-primary" href="{{ route('orders.invoice.pdf', $order->id) }}">Download PDF</a>
+        @endif
+    </div>
+    @endunless
+    @unless($forPdf ?? false)
+    <div style="display:none">
         <a href="/">← Home</a>
     </div>
     @endunless
@@ -82,7 +94,7 @@
     <div class="center muted">Powered by Bistro - bistro.my.id</div>
     @unless($forPdf ?? false)
         @if($order->status === 'paid' || $order->payment_method === 'cashier')
-            <div style="text-align:center;margin-top:12px">
+            <div style="display:none">
                 <a href="{{ route('orders.invoice.pdf', $order->id) }}">Download PDF</a>
             </div>
         @endif

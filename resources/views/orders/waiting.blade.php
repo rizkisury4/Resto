@@ -22,10 +22,7 @@
                         }
 
                         if(data.status === 'completed'){
-                            // order completed -> trigger PDF download and then show confirmation form before home
-                            window.open(pdfUrl, '_blank');
-                            // redirect to confirmation form where customer fills name and dine option
-                            setTimeout(() => { window.location = '{{ route('orders.confirm', $order->id) }}'; }, 800);
+                            window.location = invoiceUrl;
                         }
             } catch (e) {
                 console.error('status check failed', e);
@@ -40,15 +37,14 @@
             // if already completed when page loaded, trigger immediately
             const current = document.getElementById('status').innerText.trim();
             if (current === 'completed'){
-                window.open(pdfUrl, '_blank');
-                setTimeout(() => { window.location = '/'; }, 1200);
+                window.location = invoiceUrl;
             }
         });
     </script>
 </head>
 <body>
     <h2>Menunggu Pembayaran di Kasir</h2>
-    <p><a href="/">← Home</a></p>
+    <p><a href="{{ route('menu') }}">Home</a></p>
     <p>Order #{{ $order->id }}</p>
     <p>Status: <span id="status">{{ $order->status }}</span></p>
     <p>Silakan bayar di kasir dan tunggu konfirmasi dari petugas.</p>

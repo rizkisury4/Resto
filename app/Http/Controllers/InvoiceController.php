@@ -9,8 +9,10 @@ class InvoiceController extends Controller
 {
     public function show(Order $order)
     {
+        $this->authorizeCustomerOrder($order);
+
         // only show invoice when paid (for online payments). For cashier payments, show invoice after admin marks paid.
-        if ($order->status !== 'paid' && $order->payment_method === 'debit') {
+        if (! in_array($order->status, ['paid', 'completed'], true) && $order->payment_method === 'debit') {
             return view('invoice-unavailable', compact('order'));
         }
         $unitPrice = $order->unit_price ?? ($order->total_price / max(1, $order->quantity));
@@ -24,7 +26,9 @@ class InvoiceController extends Controller
 
     public function pdf(Order $order)
     {
-        if ($order->status !== 'paid' && $order->payment_method === 'debit') {
+        $this->authorizeCustomerOrder($order);
+
+        if (! in_array($order->status, ['paid', 'completed'], true) && $order->payment_method === 'debit') {
             return redirect()->route('orders.invoice', $order->id)->withErrors('Invoice belum tersedia sebelum pembayaran dikonfirmasi.');
         }
         // Prefer the barryvdh/laravel-dompdf facade if available
@@ -44,5 +48,14 @@ class InvoiceController extends Controller
         }
 
         return response('PDF generator not installed. Run: composer require barryvdh/laravel-dompdf', 500);
+    }
+
+    private function authorizeCustomerOrder(Order $order): void
+    {
+        $customerContext = session('customer_context');
+
+        if (! $customerContext || $order->customer_name !== $customerContext['customer_name']) {
+            abort(403, 'Pesanan ini bukan milik customer yang sedang aktif.');
+        }
     }
 }

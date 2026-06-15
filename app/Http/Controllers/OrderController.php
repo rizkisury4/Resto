@@ -63,9 +63,20 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = Order::latest()->get();
+        $customerContext = session('customer_context');
 
-        return view('orders', compact('orders'));
+        if (! $customerContext) {
+            return redirect()->route('order.start');
+        }
+
+        $orders = Order::where('customer_name', $customerContext['customer_name'])
+            ->latest()
+            ->get();
+
+        return view('orders', [
+            'orders' => $orders,
+            'customerContext' => $customerContext,
+        ]);
     }
 
     public function checkout(Request $request)
@@ -160,21 +171,29 @@ class OrderController extends Controller
 
     public function waiting(Order $order)
     {
+        $this->authorizeCustomerOrder($order);
+
         return view('orders.waiting', compact('order'));
     }
 
     public function status(Order $order)
     {
+        $this->authorizeCustomerOrder($order);
+
         return response()->json(['status' => $order->status]);
     }
 
     public function confirmForm(Order $order)
     {
-        return view('orders.confirm', compact('order'));
+        $this->authorizeCustomerOrder($order);
+
+        return redirect()->route('orders.invoice', $order->id);
     }
 
     public function confirmSubmit(Request $request, Order $order)
     {
+        $this->authorizeCustomerOrder($order);
+
         $validated = $request->validate([
             'customer_name' => 'nullable|string|max:255',
             'dine_type' => 'required|in:dine_in,takeaway',
@@ -184,6 +203,15 @@ class OrderController extends Controller
         $order->notes = $validated['dine_type'] === 'dine_in' ? ($order->notes ?? 'Makan di sini') : ($order->notes ?? 'Takeaway');
         $order->save();
 
-        return view('orders.confirm-success', ['order' => $order]);
+        return redirect()->route('orders.invoice', $order->id);
+    }
+
+    private function authorizeCustomerOrder(Order $order): void
+    {
+        $customerContext = session('customer_context');
+
+        if (! $customerContext || $order->customer_name !== $customerContext['customer_name']) {
+            abort(403, 'Pesanan ini bukan milik customer yang sedang aktif.');
+        }
     }
 }

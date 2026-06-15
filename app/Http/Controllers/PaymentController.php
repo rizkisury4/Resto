@@ -10,12 +10,16 @@ class PaymentController extends Controller
     // Show a simple mock payment page where customer can click to 'pay'
     public function simulatePage(Order $order)
     {
+        $this->authorizeCustomerOrder($order);
+
         return view('payment.simulate', compact('order'));
     }
 
     // Simulate payment (would be called by form on simulate page)
     public function mockPay(Request $request, Order $order)
     {
+        $this->authorizeCustomerOrder($order);
+
         $order->status = 'paid';
         $order->save();
 
@@ -41,5 +45,14 @@ class PaymentController extends Controller
         $order->save();
 
         return response()->json(['ok' => true]);
+    }
+
+    private function authorizeCustomerOrder(Order $order): void
+    {
+        $customerContext = session('customer_context');
+
+        if (! $customerContext || $order->customer_name !== $customerContext['customer_name']) {
+            abort(403, 'Pesanan ini bukan milik customer yang sedang aktif.');
+        }
     }
 }

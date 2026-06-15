@@ -1,6 +1,10 @@
 -- Schema dump generated from Laravel migrations
 -- Applies to MySQL (InnoDB), utf8mb4
 
+
+
+
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 CREATE TABLE IF NOT EXISTS `users` (
@@ -9,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` VARCHAR(255) NOT NULL,
   `email_verified_at` TIMESTAMP NULL DEFAULT NULL,
   `password` VARCHAR(255) NOT NULL,
+  `is_admin` TINYINT(1) NOT NULL DEFAULT 0,
   `remember_token` VARCHAR(100) DEFAULT NULL,
   `created_at` TIMESTAMP NULL DEFAULT NULL,
   `updated_at` TIMESTAMP NULL DEFAULT NULL,
@@ -58,12 +63,20 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `customer_name` VARCHAR(255) DEFAULT NULL,
   `notes` TEXT DEFAULT NULL,
   `payment_method` ENUM('debit','cashier') NOT NULL DEFAULT 'cashier',
-  `status` ENUM('pending','paid','completed') NOT NULL DEFAULT 'pending',
+  `status` VARCHAR(255) NOT NULL DEFAULT 'pending',
   `total_price` DECIMAL(10,2) DEFAULT NULL,
   `created_at` TIMESTAMP NULL DEFAULT NULL,
   `updated_at` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `users` (`name`, `email`, `password`, `is_admin`, `created_at`, `updated_at`)
+VALUES ('Administrator', 'admin@resto.test', '$2y$10$vUko/4FZJ3bdtngwe7kuPeAxjB9SlESEUZO46XShMnZBV/VycY4Ni', 1, NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `password` = VALUES(`password`),
+  `is_admin` = VALUES(`is_admin`),
+  `updated_at` = NOW();
 
 SET FOREIGN_KEY_CHECKS = 1;
 
