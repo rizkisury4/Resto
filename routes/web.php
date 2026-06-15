@@ -2,9 +2,13 @@
 
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,3 +48,21 @@ Route::get('/chatbot/models', function () {
 
     return response()->json($resp->json());
 });
+
+Route::get('orders/{order}/invoice', [InvoiceController::class, 'show'])->name('orders.invoice');
+Route::get('orders/{order}/invoice/pdf', [InvoiceController::class, 'pdf'])->name('orders.invoice.pdf');
+
+// Admin routes (simple session-based auth)
+Route::get('admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
+Route::post('admin/login', [AdminAuthController::class, 'login'])->name('admin.login.post');
+Route::get('admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+
+Route::middleware(['admin.auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::patch('orders/{order}', [AdminOrderController::class, 'updateStatus'])->name('orders.update');
+});
+
+// Mock payment routes for simulation
+Route::get('payment/mock/{order}', [PaymentController::class, 'simulatePage'])->name('payment.simulate');
+Route::post('payment/mock/{order}', [PaymentController::class, 'mockPay'])->name('payment.mock.pay');
+Route::post('payment/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');

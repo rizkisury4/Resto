@@ -72,8 +72,24 @@ class OrderController extends Controller
 
         $order = Order::create($validated);
 
+        // set status depending on payment method
+        if ($validated['payment_method'] === 'debit') {
+            // requires payment confirmation (simulate gateway)
+            $order->status = 'pending_payment';
+        } else {
+            $order->status = 'pending';
+        }
+        $order->total_price = $validated['total_price'];
+        $order->save();
+
         session()->forget('order_data');
 
-        return redirect('/')->with('success', 'Pesanan berhasil diproses dengan metode pembayaran ' . ($validated['payment_method'] === 'debit' ? 'Debit' : 'Bayar di Kasir') . '!');
+        // If payment is online (debit) redirect to mock payment gateway simulation
+        if ($validated['payment_method'] === 'debit') {
+            return redirect()->route('payment.simulate', $order->id);
+        }
+
+        // For cashier payment, show a simple confirmation page (or you can show invoice after admin marks paid)
+        return redirect('/')->with('success', 'Pesanan diterima. Silakan bayar di kasir.');
     }
 }
