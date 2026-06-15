@@ -70,7 +70,7 @@
     <div class="page">
         <header>
             <h1>Daftar Pesanan</h1>
-            <a class="back-link" href="/">Kembali ke Menu</a>
+            <a class="back-link" href="{{ route('menu') }}">Kembali ke Menu</a>
         </header>
 
         @if ($orders->isEmpty())

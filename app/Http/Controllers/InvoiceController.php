@@ -13,7 +13,6 @@ class InvoiceController extends Controller
         if ($order->status !== 'paid' && $order->payment_method === 'debit') {
             return view('invoice-unavailable', compact('order'));
         }
-
         $unitPrice = $order->unit_price ?? ($order->total_price / max(1, $order->quantity));
         $quantity = $order->quantity ?? 1;
         $total = $order->total_price ?? ($unitPrice * $quantity);
@@ -28,10 +27,17 @@ class InvoiceController extends Controller
         if ($order->status !== 'paid' && $order->payment_method === 'debit') {
             return redirect()->route('orders.invoice', $order->id)->withErrors('Invoice belum tersedia sebelum pembayaran dikonfirmasi.');
         }
-
         // Prefer the barryvdh/laravel-dompdf facade if available
         if (class_exists('\\Barryvdh\\DomPDF\\Facade\\Pdf') || class_exists('PDF')) {
-            $data = ['order' => $order, 'unitPrice' => $order->total_price / max(1, $order->quantity), 'quantity' => $order->quantity, 'total' => $order->total_price];
+            $unitPrice = $order->unit_price ?? ($order->total_price / max(1, $order->quantity));
+            $quantity = $order->quantity ?? 1;
+            $total = $order->total_price ?? ($unitPrice * $quantity);
+            $paymentAmount = $order->payment_amount ?? $total;
+            $change = $paymentAmount - $total;
+
+            $data = compact('order', 'unitPrice', 'quantity', 'total', 'paymentAmount', 'change');
+            // indicate view is rendered for PDF so links/buttons can be hidden
+            $data['forPdf'] = true;
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoice', $data);
 
             return $pdf->download('invoice-' . $order->id . '.pdf');

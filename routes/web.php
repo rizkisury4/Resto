@@ -21,9 +21,10 @@ use App\Http\Controllers\PaymentController;
 |
 */
 
-Route::get('/', function () {
-    return view('menu');
-});
+Route::get('/', [OrderController::class, 'start'])->name('order.start');
+Route::post('/start-order', [OrderController::class, 'startOrder'])->name('order.start.submit');
+Route::post('/reset-order-session', [OrderController::class, 'resetOrderSession'])->name('order.session.reset');
+Route::get('/menu', [OrderController::class, 'menu'])->name('menu');
 
 Route::post('/order/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
 Route::post('/order', [OrderController::class, 'store'])->name('order.store');
@@ -51,6 +52,10 @@ Route::get('/chatbot/models', function () {
 
 Route::get('orders/{order}/invoice', [InvoiceController::class, 'show'])->name('orders.invoice');
 Route::get('orders/{order}/invoice/pdf', [InvoiceController::class, 'pdf'])->name('orders.invoice.pdf');
+Route::get('orders/{order}/waiting', [\App\Http\Controllers\OrderController::class, 'waiting'])->name('orders.waiting');
+Route::get('orders/{order}/status', [\App\Http\Controllers\OrderController::class, 'status'])->name('orders.status');
+Route::get('orders/{order}/confirm', [\App\Http\Controllers\OrderController::class, 'confirmForm'])->name('orders.confirm');
+Route::post('orders/{order}/confirm', [\App\Http\Controllers\OrderController::class, 'confirmSubmit'])->name('orders.confirm.submit');
 
 // Admin routes (simple session-based auth)
 Route::get('admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');

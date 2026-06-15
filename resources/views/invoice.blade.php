@@ -15,6 +15,11 @@
     </style>
 </head>
 <body>
+    @unless($forPdf ?? false)
+    <div style="text-align:center;margin-top:8px;margin-bottom:8px">
+        <a href="/">← Home</a>
+    </div>
+    @endunless
     <div class="center">
         <h2 style="margin:6px 0">Restoran Nusantara</h2>
         <div class="muted">Jl. Kelapa Gading, Jakarta Utara</div>
@@ -75,10 +80,12 @@
 
     <div style="height:20px"></div>
     <div class="center muted">Powered by Bistro - bistro.my.id</div>
-    @if($order->status === 'paid' || $order->payment_method === 'cashier')
-        <div style="text-align:center;margin-top:12px">
-            <a href="{{ route('orders.invoice.pdf', $order->id) }}">Download PDF</a>
-        </div>
-    @endif
+    @unless($forPdf ?? false)
+        @if($order->status === 'paid' || $order->payment_method === 'cashier')
+            <div style="text-align:center;margin-top:12px">
+                <a href="{{ route('orders.invoice.pdf', $order->id) }}">Download PDF</a>
+            </div>
+        @endif
+    @endunless
 </body>
 </html>

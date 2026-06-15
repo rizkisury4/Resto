@@ -148,7 +148,7 @@
     <div class="page">
         <header>
             <h1>Checkout Pesanan</h1>
-            <a class="back-link" href="/">← Kembali ke Menu</a>
+            <a class="back-link" href="{{ route('menu') }}">← Kembali ke Menu</a>
         </header>
 
         <div class="checkout-box">
@@ -167,6 +167,10 @@
                         <strong>{{ $customer_name }}</strong>
                     </div>
                 @endif
+                <div class="summary-row">
+                    <span>Tipe Pesanan:</span>
+                    <strong>{{ $service_type === 'dine_in' ? 'Makan di sini' : 'Takeaway' }}</strong>
+                </div>
                 @if ($notes)
                     <div class="summary-row">
                         <span>Catatan:</span>
@@ -184,6 +188,7 @@
                 <input type="hidden" name="item_name" value="{{ $item_name }}" />
                 <input type="hidden" name="quantity" value="{{ $quantity }}" />
                 <input type="hidden" name="customer_name" value="{{ $customer_name }}" />
+                <input type="hidden" name="service_type" value="{{ $service_type }}" />
                 <input type="hidden" name="notes" value="{{ $notes }}" />
                 <input type="hidden" name="total_price" value="{{ $total_price }}" />
 
@@ -209,7 +214,7 @@
                 </div>
 
                 <div class="button-group">
-                    <a href="/" class="btn btn-secondary">Batal</a>
+                    <a href="{{ route('menu') }}" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-primary">Proses Pesanan</button>
                 </div>
             </form>

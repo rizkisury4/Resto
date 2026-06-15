@@ -238,8 +238,12 @@
             <div class="tagline">Menu Makanan Indonesia </div>
             <h1>Restoran Nusantara</h1>
             <p class="subtitle">
-                Nikmati sajian khas Indonesia dengan tampilan sederhana. Tidak perlu register atau login — cukup pilih menu favorit Anda dan lihat detail hidangan lokal seperti nasi goreng, mie goreng, ayam bakar, ayam geprek, dan banyak lagi.
+                Halo, {{ $customerContext['customer_name'] }}. Pesanan ini untuk {{ $customerContext['service_type'] === 'dine_in' ? 'makan di sini' : 'takeaway' }}.
             </p>
+            <form action="{{ route('order.session.reset') }}" method="POST" style="margin-top:16px;">
+                @csrf
+                <button type="submit" style="padding:10px 16px; border:1px solid rgba(181,63,46,0.24); border-radius:999px; background:#fff8f2; color:#8f2f1d; font-weight:700; cursor:pointer;">Ganti Nama / Tipe Pesanan</button>
+            </form>
         </header>
 
         <main class="menu-grid">
@@ -335,11 +339,6 @@
                 <label style="display:block; font-weight:700; color:#5a4d45;">
                     Jumlah
                     <input type="number" name="quantity" min="1" max="20" value="1" required style="width:120px; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;" />
-                </label>
-
-                <label style="display:block; font-weight:700; color:#5a4d45;">
-                    Nama
-                    <input type="text" name="customer_name" value="{{ old('customer_name') }}" placeholder="Contoh: Budi" style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;" />
                 </label>
 
                 <label style="display:block; font-weight:700; color:#5a4d45;">

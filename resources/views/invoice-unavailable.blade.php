@@ -6,6 +6,7 @@
     <title>Invoice Belum Tersedia</title>
 </head>
 <body>
+    <p style="margin-bottom:8px"><a href="/">← Home</a></p>
     <h2>Invoice belum tersedia untuk Order #{{ $order->id }}</h2>
     <p>Status saat ini: {{ $order->status }}</p>
     <p>Invoice akan tersedia setelah pembayaran dikonfirmasi.</p>
