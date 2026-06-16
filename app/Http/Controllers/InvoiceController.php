@@ -15,6 +15,15 @@ class InvoiceController extends Controller
         if (! in_array($order->status, ['paid', 'completed'], true) && $order->payment_method === 'debit') {
             return view('invoice-unavailable', compact('order'));
         }
+        if (!empty($order->items) && is_array($order->items)) {
+            $items = $order->items;
+            $total = $order->total_price ?? array_sum(array_map(function($i){ return ($i['subtotal'] ?? ($i['unit_price'] * ($i['quantity'] ?? 1))); }, $items));
+            $paymentAmount = $order->payment_amount ?? $total;
+            $change = $paymentAmount - $total;
+
+            return view('invoice', compact('order', 'items', 'total', 'paymentAmount', 'change'));
+        }
+
         $unitPrice = $order->unit_price ?? ($order->total_price / max(1, $order->quantity));
         $quantity = $order->quantity ?? 1;
         $total = $order->total_price ?? ($unitPrice * $quantity);
@@ -33,13 +42,22 @@ class InvoiceController extends Controller
         }
         // Prefer the barryvdh/laravel-dompdf facade if available
         if (class_exists('\\Barryvdh\\DomPDF\\Facade\\Pdf') || class_exists('PDF')) {
-            $unitPrice = $order->unit_price ?? ($order->total_price / max(1, $order->quantity));
-            $quantity = $order->quantity ?? 1;
-            $total = $order->total_price ?? ($unitPrice * $quantity);
-            $paymentAmount = $order->payment_amount ?? $total;
-            $change = $paymentAmount - $total;
+            if (!empty($order->items) && is_array($order->items)) {
+                $items = $order->items;
+                $total = $order->total_price ?? array_sum(array_map(function($i){ return ($i['subtotal'] ?? ($i['unit_price'] * ($i['quantity'] ?? 1))); }, $items));
+                $paymentAmount = $order->payment_amount ?? $total;
+                $change = $paymentAmount - $total;
 
-            $data = compact('order', 'unitPrice', 'quantity', 'total', 'paymentAmount', 'change');
+                $data = compact('order','items','total','paymentAmount','change');
+            } else {
+                $unitPrice = $order->unit_price ?? ($order->total_price / max(1, $order->quantity));
+                $quantity = $order->quantity ?? 1;
+                $total = $order->total_price ?? ($unitPrice * $quantity);
+                $paymentAmount = $order->payment_amount ?? $total;
+                $change = $paymentAmount - $total;
+
+                $data = compact('order', 'unitPrice', 'quantity', 'total', 'paymentAmount', 'change');
+            }
             // indicate view is rendered for PDF so links/buttons can be hidden
             $data['forPdf'] = true;
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoice', $data);

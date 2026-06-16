@@ -96,7 +96,18 @@
                     @foreach ($orders as $order)
                         <tr>
                             <td>{{ $order->id }}</td>
-                            <td>{{ $order->item_name }}</td>
+                            <td>
+                                @if(!empty($order->items) && is_array($order->items))
+                                    <div style="font-weight:700">Items</div>
+                                    <ul style="margin:6px 0 0 18px; padding:0;">
+                                        @foreach($order->items as $it)
+                                            <li style="margin-bottom:4px">{{ $it['item_name'] }} x{{ $it['quantity'] }} — Rp {{ number_format($it['subtotal'] ?? ($it['unit_price']*$it['quantity']), 0, ',', '.') }}</li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    {{ $order->item_name }}
+                                @endif
+                            </td>
                             <td>{{ $order->quantity }}</td>
                             <td>Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                             <td>{{ $order->customer_name ?: '-' }}</td>

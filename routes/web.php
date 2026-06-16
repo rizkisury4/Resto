@@ -66,6 +66,7 @@ Route::middleware(['admin.auth'])->prefix('admin')->name('admin.')->group(functi
     Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::patch('orders/{order}', [AdminOrderController::class, 'updateStatus'])->name('orders.update');
     Route::post('orders/pos', [AdminOrderController::class, 'posCreate'])->name('orders.pos.create');
+    Route::get('orders/{order}/receipt', [AdminOrderController::class, 'receipt'])->name('orders.receipt');
 });
 
 // Mock payment routes for simulation

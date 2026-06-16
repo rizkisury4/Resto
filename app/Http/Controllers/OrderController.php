@@ -209,9 +209,15 @@ class OrderController extends Controller
                 'quantity' => array_sum(array_column($items, 'quantity')),
                 'customer_name' => $customerContext['customer_name'],
                 'notes' => $notesText,
+                'items' => $items,
                 'payment_method' => $request->input('payment_method'),
                 'total_price' => $totalPrice,
             ]);
+            // if a cashier created this (admin POS) allow recording cashier_name via request
+            if ($request->filled('cashier_name')) {
+                $order->cashier_name = $request->input('cashier_name');
+                $order->save();
+            }
         } else {
             $validated = $request->validate([
                 'item_name' => ['required', 'string', Rule::in(array_keys($this->menuPrices))],
@@ -227,6 +233,15 @@ class OrderController extends Controller
             $validated['notes'] = trim($serviceLabel . ($validated['notes'] ? ' - ' . $validated['notes'] : ''));
 
             $order = Order::create($validated);
+            // ensure single-item orders also store items array for consistency
+            $order->items = [[
+                'item_name' => $validated['item_name'],
+                'quantity' => $validated['quantity'],
+                'unit_price' => $this->menuPrices[$validated['item_name']],
+                'notes' => $validated['notes'] ?? null,
+                'subtotal' => $validated['quantity'] * $this->menuPrices[$validated['item_name']],
+            ]];
+            $order->save();
         }
 
         // set status depending on payment method
@@ -242,7 +257,7 @@ class OrderController extends Controller
         session()->forget('order_data');
 
         // If payment is online (debit) redirect to mock payment gateway simulation
-        if ($validated['payment_method'] === 'debit') {
+        if ($paymentMethod === 'debit') {
             return redirect()->route('payment.simulate', $order->id);
         }
 

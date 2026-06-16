@@ -254,7 +254,10 @@
                         <h2 class="card-title">Nasi Goreng</h2>
                         <p class="card-text">Nasi goreng hangat dengan aroma bawang putih, kecap manis, irisan ayam, telur mata sapi, dan acar pedas yang segar.</p>
                     </div>
-                    <div class="card-price">Rp 25.000</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <div class="card-price">Rp 25.000</div>
+                        <button type="button" class="card-add" data-name="Nasi Goreng" data-price="25000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
+                    </div>
                 </div>
             </article>
 
@@ -265,7 +268,10 @@
                         <h2 class="card-title">Mie Goreng</h2>
                         <p class="card-text">Mie goreng spesial dengan bumbu kecap, sayuran segar, potongan ayam, dan taburan bawang goreng yang renyah.</p>
                     </div>
-                    <div class="card-price">Rp 22.000</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <div class="card-price">Rp 22.000</div>
+                        <button type="button" class="card-add" data-name="Mie Goreng" data-price="22000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
+                    </div>
                 </div>
             </article>
 
@@ -276,7 +282,10 @@
                         <h2 class="card-title">Nasi Ayam Goreng</h2>
                         <p class="card-text">Seporsi nasi putih hangat dengan ayam goreng kremes, sambal matah, lalapan segar, dan sayur asem.</p>
                     </div>
-                    <div class="card-price">Rp 29.000</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <div class="card-price">Rp 29.000</div>
+                        <button type="button" class="card-add" data-name="Nasi Ayam Goreng" data-price="29000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
+                    </div>
                 </div>
             </article>
 
@@ -287,7 +296,10 @@
                         <h2 class="card-title">Ayam Bakar</h2>
                         <p class="card-text">Ayam bakar manis pedas matang sempurna, disajikan dengan nasi hangat, lalapan, dan sambal terasi khas Nusantara.</p>
                     </div>
-                    <div class="card-price">Rp 32.000</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <div class="card-price">Rp 32.000</div>
+                        <button type="button" class="card-add" data-name="Ayam Bakar" data-price="32000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
+                    </div>
                 </div>
             </article>
 
@@ -298,7 +310,10 @@
                         <h2 class="card-title">Ayam Geprek</h2>
                         <p class="card-text">Ayam goreng tepung digeprek dengan sambal cabai rawit, keju, dan kecap manis, cocok untuk pencinta rasa pedas.</p>
                     </div>
-                    <div class="card-price">Rp 28.000</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <div class="card-price">Rp 28.000</div>
+                        <button type="button" class="card-add" data-name="Ayam Geprek" data-price="28000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
+                    </div>
                 </div>
             </article>
 
@@ -309,7 +324,10 @@
                         <h2 class="card-title">Sate Ayam</h2>
                         <p class="card-text">Sate ayam empuk dengan bumbu kacang gurih, lontong, irisan bawang merah, dan sambal kecap original.</p>
                     </div>
-                    <div class="card-price">Rp 26.000</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <div class="card-price">Rp 26.000</div>
+                        <button type="button" class="card-add" data-name="Sate Ayam" data-price="26000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
+                    </div>
                 </div>
             </article>
         </main>
@@ -322,89 +340,95 @@
                 </div>
             @endif
 
-            <form action="{{ route('order.checkout') }}" method="POST" style="display:grid; gap:14px;">
+            <form id="cartForm" action="{{ route('order.checkout') }}" method="POST" style="display:grid; gap:14px;">
                 @csrf
 
-                <div id="itemsContainer" style="display:grid; gap:12px;">
-                    <template id="itemRowTemplate">
-                        <div class="item-row" style="display:flex; gap:12px; align-items:flex-start;">
-                            <div style="flex:1;">
-                                <label style="display:block; font-weight:700; color:#5a4d45;">Pilih Menu
-                                    <select name="items[INDEX][item_name]" required style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;">
-                                        <option value="Nasi Goreng">Nasi Goreng - Rp 25.000</option>
-                                        <option value="Mie Goreng">Mie Goreng - Rp 22.000</option>
-                                        <option value="Nasi Ayam Goreng">Nasi Ayam Goreng - Rp 29.000</option>
-                                        <option value="Ayam Bakar">Ayam Bakar - Rp 32.000</option>
-                                        <option value="Ayam Geprek">Ayam Geprek - Rp 28.000</option>
-                                        <option value="Sate Ayam">Sate Ayam - Rp 26.000</option>
-                                    </select>
-                                </label>
-                            </div>
-
-                            <div style="width:120px;">
-                                <label style="display:block; font-weight:700; color:#5a4d45;">Jumlah
-                                    <input type="number" name="items[INDEX][quantity]" min="1" max="20" value="1" required style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;" />
-                                </label>
-                            </div>
-
-                            <div style="width:40px; display:flex; align-items:center;">
-                                <button type="button" class="remove-item" style="margin-top:26px; background:transparent; border:none; color:#b53f2e; font-weight:700; cursor:pointer;">Hapus</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label style="display:block; font-weight:700; color:#5a4d45;">Catatan (opsional)
-                                <textarea name="items[INDEX][notes]" rows="2" style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;"></textarea>
-                            </label>
-                        </div>
-                    </template>
+                <div id="cartDisplay" style="display:grid; gap:12px;">
+                    <!-- cart rows rendered by JS -->
                 </div>
 
-                <div style="display:flex; gap:8px;">
-                    <button type="button" id="addItemBtn" style="padding:10px 14px; border:1px solid rgba(181,63,46,0.24); border-radius:999px; background:#fff8f2; color:#8f2f1d; font-weight:700; cursor:pointer;">+ Tambah Item</button>
-                    <span style="align-self:center; color:#6d6057;">Tambah beberapa jenis makanan sebelum checkout.</span>
-                </div>
-
-                @if ($errors->any())
-                    <div style="color:#8f2f1d; background:#fff1f0; border:1px solid #f1c6be; border-radius:14px; padding:14px;">
-                        <strong>Ada kesalahan:</strong>
-                        <ul style="margin:8px 0 0 18px;">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-weight:700">Total: <span id="cartTotal">Rp 0</span></div>
+                    <div>
+                        <button type="submit" id="checkoutBtn" style="align-self:flex-start; padding:14px 24px; border:none; border-radius:14px; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer; display:none;">Lanjut ke Pembayaran</button>
+                        <a href="{{ route('order.index') }}" style="display:inline-block; margin-left:12px; color:#b53f2e;">Lihat daftar pesanan</a>
                     </div>
-                @endif
-
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <button type="submit" style="align-self:flex-start; padding:14px 24px; border:none; border-radius:14px; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Lanjut ke Pembayaran</button>
-                    <a href="{{ route('order.index') }}" style="display:inline-block; margin-top:6px; color:#b53f2e;">Lihat daftar pesanan</a>
                 </div>
             </form>
 
             <script>
                 (function(){
-                    const tpl = document.getElementById('itemRowTemplate').innerHTML;
-                    const container = document.getElementById('itemsContainer');
-                    const addBtn = document.getElementById('addItemBtn');
-                    let idx = 0;
+                    const cartDisplay = document.getElementById('cartDisplay');
+                    const cartTotalEl = document.getElementById('cartTotal');
+                    const checkoutBtn = document.getElementById('checkoutBtn');
+                    const cartForm = document.getElementById('cartForm');
+                    let cart = [];
 
-                    function addRow(data) {
-                        let html = tpl.replace(/INDEX/g, idx);
-                        const wrapper = document.createElement('div');
-                        wrapper.innerHTML = html;
-                        // attach remove handler
-                        wrapper.querySelectorAll('.remove-item').forEach(function(btn){
-                            btn.addEventListener('click', function(){
-                                wrapper.remove();
-                            });
+                    function formatRupiah(v){ return 'Rp ' + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+                    function renderCart(){
+                        cartDisplay.innerHTML = '';
+                        let total = 0;
+                        cart.forEach((it, idx)=>{
+                            const row = document.createElement('div');
+                            row.style.display='grid'; row.style.gridTemplateColumns='1fr 120px 80px'; row.style.gap='8px'; row.style.alignItems='center';
+                            row.innerHTML = `
+                                <div>
+                                    <div style="font-weight:700">${it.item_name}</div>
+                                    <div style="font-size:0.9rem;color:#666">${formatRupiah(it.unit_price)}</div>
+                                    <div style="margin-top:6px;"><textarea data-idx="${idx}" class="note-box" rows="2" placeholder="Catatan (opsional)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px">${it.notes||''}</textarea></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <button type="button" class="dec-btn" data-idx="${idx}" style="padding:6px 8px;">-</button>
+                                    <input type="number" class="qty-input" data-idx="${idx}" value="${it.quantity}" min="1" style="width:60px; text-align:center; padding:6px; border-radius:8px; border:1px solid #ddd" />
+                                    <button type="button" class="inc-btn" data-idx="${idx}" style="padding:6px 8px;">+</button>
+                                </div>
+                                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                                    <div style="font-weight:700">${formatRupiah(it.unit_price * it.quantity)}</div>
+                                    <div><button type="button" class="remove-btn" data-idx="${idx}" style="background:transparent;border:none;color:#b53f2e;cursor:pointer">Hapus</button></div>
+                                </div>
+                            `;
+                            cartDisplay.appendChild(row);
+                            total += it.unit_price * it.quantity;
                         });
-                        container.appendChild(wrapper);
-                        idx++;
+
+                        cartTotalEl.textContent = formatRupiah(total);
+                        checkoutBtn.style.display = cart.length ? 'inline-block' : 'none';
+
+                        // attach events
+                        cartDisplay.querySelectorAll('.inc-btn').forEach(b=> b.addEventListener('click', ()=>{ const i=b.dataset.idx; cart[i].quantity++; renderCart(); }));
+                        cartDisplay.querySelectorAll('.dec-btn').forEach(b=> b.addEventListener('click', ()=>{ const i=b.dataset.idx; cart[i].quantity = Math.max(1, cart[i].quantity-1); renderCart(); }));
+                        cartDisplay.querySelectorAll('.remove-btn').forEach(b=> b.addEventListener('click', ()=>{ const i=b.dataset.idx; cart.splice(i,1); renderCart(); }));
+                        cartDisplay.querySelectorAll('.qty-input').forEach(inp=> inp.addEventListener('change', ()=>{ const i=inp.dataset.idx; cart[i].quantity = Math.max(1, parseInt(inp.value)||1); renderCart(); }));
+                        cartDisplay.querySelectorAll('.note-box').forEach(nb=> nb.addEventListener('input', ()=>{ const i=nb.dataset.idx; cart[i].notes = nb.value; }));
                     }
 
-                    // initialize with one row
-                    addBtn.addEventListener('click', function(){ addRow(); });
-                    addRow();
+                    // add-to-cart from card buttons
+                    document.querySelectorAll('.card-add').forEach(btn=>{
+                        btn.addEventListener('click', ()=>{
+                            const name = btn.dataset.name;
+                            const price = parseInt(btn.dataset.price);
+                            const found = cart.find(it=>it.item_name===name);
+                            if(found){ found.quantity++; }
+                            else { cart.push({ item_name: name, unit_price: price, quantity: 1, notes: '' }); }
+                            renderCart();
+                        });
+                    });
+
+                    // on submit, inject hidden inputs for items
+                    cartForm.addEventListener('submit', function(e){
+                        // clear previous hidden inputs
+                        cartForm.querySelectorAll('input[type="hidden"].cart-hidden').forEach(n=>n.remove());
+                        cart.forEach((it, idx)=>{
+                            const f1 = document.createElement('input'); f1.type='hidden'; f1.name=`items[${idx}][item_name]`; f1.value=it.item_name; f1.className='cart-hidden';
+                            const f2 = document.createElement('input'); f2.type='hidden'; f2.name=`items[${idx}][quantity]`; f2.value=it.quantity; f2.className='cart-hidden';
+                            const f3 = document.createElement('input'); f3.type='hidden'; f3.name=`items[${idx}][notes]`; f3.value=it.notes||''; f3.className='cart-hidden';
+                            cartForm.appendChild(f1); cartForm.appendChild(f2); cartForm.appendChild(f3);
+                        });
+                    });
+
+                    // initial empty
+                    renderCart();
                 })();
             </script>
         </section>

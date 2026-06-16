@@ -17,5 +17,12 @@ class Order extends Model
         'payment_method',
         'status',
         'total_price',
+        'items',
+        'cashier_name',
+    ];
+
+    protected $casts = [
+        'items' => 'array',
+        'total_price' => 'decimal:2',
     ];
 }

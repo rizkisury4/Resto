@@ -47,13 +47,36 @@
             <h3 style="margin-top:0;">Pesanan Aktif</h3>
             <div style="max-height:68vh; overflow:auto;">
                 <table style="width:100%; border-collapse:collapse">
-                    <thead><tr><th>ID</th><th>Item</th><th>Qty</th><th>Status</th><th>ETA</th><th>Action</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Notes</th>
+                            <th>Status</th>
+                            <th>ETA</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach($foods as $order)
                             <tr style="border-bottom:1px solid #f2f2f2">
                                 <td>{{ $order->id }}</td>
                                 <td style="max-width:160px">{{ $order->item_name }}</td>
                                 <td>{{ $order->quantity }}</td>
+                                <td style="max-width:420px;">
+                                    {{ $order->notes }}
+                                    @if(!empty($order->items) && is_array($order->items))
+                                        <div style="margin-top:6px; font-size:0.9rem; color:#444">
+                                            <strong>Items:</strong>
+                                            <ul style="margin:6px 0 0 18px; padding:0;">
+                                                @foreach($order->items as $it)
+                                                    <li>{{ $it['item_name'] }} x{{ $it['quantity'] }} — Rp{{ number_format($it['subtotal'] ?? ($it['unit_price']*$it['quantity']),0,',','.') }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+                                </td>
                                 <td>{{ $order->status }}</td>
                                 <td>{{ $order->eta ? $order->eta->format('H:i') . ' (' . $order->estimated_prep_minutes . 'm)' : '-' }}</td>
                                 <td style="white-space:nowrap">
@@ -69,6 +92,7 @@
                                         </select>
                                         <button type="submit">Update</button>
                                     </form>
+                                    <a href="{{ route('admin.orders.receipt', $order) }}" style="margin-left:8px; display:inline-block; padding:6px 8px; background:#f3f3f3; border-radius:6px; text-decoration:none; color:#333">Cetak Struk</a>
                                 </td>
                             </tr>
                         @endforeach

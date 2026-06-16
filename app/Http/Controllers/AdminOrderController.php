@@ -34,8 +34,17 @@ class AdminOrderController extends Controller
         // annotate orders with estimate ready time (ETA)
         $orders->transform(function($o) use ($menuPrep) {
             $baseMinutes = 0;
-            // if notes contains 'Beberapa item' or detailed list, attempt to parse quantities
-            if (!empty($o->notes) && strpos($o->notes, ' - ') !== false) {
+            // if items JSON present, use it for prep time calculation
+            if (!empty($o->items) && is_array($o->items)) {
+                $items = $o->items;
+                foreach ($items as $it) {
+                    $name = $it['item_name'] ?? null;
+                    $qty = isset($it['quantity']) ? (int)$it['quantity'] : 1;
+                    if ($name && isset($menuPrep[$name])) {
+                        $baseMinutes += $menuPrep[$name] * $qty;
+                    }
+                }
+            } elseif (!empty($o->notes) && strpos($o->notes, ' - ') !== false) {
                 // notes format: "Makan di sini - Item xQ (note) ; Item2 xQ"
                 $parts = explode(' - ', $o->notes, 2);
                 $itemsPart = $parts[1] ?? '';
@@ -122,11 +131,19 @@ class AdminOrderController extends Controller
             'quantity' => $totalQty,
             'customer_name' => 'POS',
             'notes' => $notes,
+            'items' => $items,
             'payment_method' => $request->input('payment_method'),
             'status' => $request->input('payment_method') === 'cashier' ? 'paid' : 'pending_payment',
+            'cashier_name' => auth()->user()->name ?? null,
             'total_price' => $total,
         ]);
 
         return redirect()->route('admin.orders.index')->with('status', 'POS order created (ID: '.$order->id.')');
+    }
+
+    public function receipt(Order $order)
+    {
+        // admin can view/print receipt regardless of customer context
+        return view('admin.receipt', ['order' => $order]);
     }
 }

@@ -59,13 +59,28 @@
 
     <div class="line"></div>
 
-    <div class="item">
-        <div class="row">
-            <div>{{ $order->item_name }}</div>
-            <div>Rp{{ number_format($unitPrice * $quantity,0,',','.') }}</div>
+    @if(!empty($items) && is_array($items))
+        @foreach($items as $it)
+            <div class="item">
+                <div class="row">
+                    <div>{{ $it['item_name'] }}</div>
+                    <div>Rp{{ number_format($it['subtotal'] ?? ($it['unit_price'] * ($it['quantity'] ?? 1)),0,',','.') }}</div>
+                </div>
+                <div class="muted">{{ $it['quantity'] ?? 1 }} x Rp{{ number_format($it['unit_price'] ?? (($it['subtotal'] ?? 0) / max(1, ($it['quantity'] ?? 1))),0,',','.') }}</div>
+                @if(!empty($it['notes']))
+                    <div class="muted">Catatan: {{ $it['notes'] }}</div>
+                @endif
+            </div>
+        @endforeach
+    @else
+        <div class="item">
+            <div class="row">
+                <div>{{ $order->item_name }}</div>
+                <div>Rp{{ number_format($unitPrice * $quantity,0,',','.') }}</div>
+            </div>
+            <div class="muted">{{ $quantity }} x Rp{{ number_format($unitPrice,0,',','.') }}</div>
         </div>
-        <div class="muted">{{ $quantity }} x Rp{{ number_format($unitPrice,0,',','.') }}</div>
-    </div>
+    @endif
 
     <div class="line"></div>
 
