@@ -95,7 +95,7 @@ class AdminOrderController extends Controller
 
         $foods = $orders;
 
-        return view('admin.orders', compact('payments', 'foods', 'menuPrices'));
+        return view('admin.orders', compact('payments', 'foods', 'menuPrices', 'menuItems'));
     }
 
     public function updateStatus(Request $request, Order $order)

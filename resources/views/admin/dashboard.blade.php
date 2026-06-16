@@ -6,6 +6,9 @@
     <title>Admin - Dashboard</title>
 </head>
 <body>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
+    <script src="{{ asset('js/app.js') }}" defer></script>
+
     <h2>Laporan Penjualan</h2>
     <p><a href="{{ route('admin.logout') }}">Logout</a></p>
 

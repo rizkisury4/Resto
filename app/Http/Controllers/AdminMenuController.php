@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminMenuController extends Controller
 {
@@ -20,12 +22,27 @@ class AdminMenuController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'image_path' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:2048',
         ]);
 
-        MenuItem::create($data);
+        // handle uploaded image
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '-' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('public/menu_images', $filename);
+            // store publicly accessible path
+            $data['image_path'] = 'storage/menu_images/' . $filename;
+        }
 
-        return redirect()->route('admin.menu.index')->with('status', 'Menu item ditambahkan.');
+        MenuItem::create([
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'price' => $data['price'],
+            'image_path' => $data['image_path'] ?? null,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('admin.menu.index')->with('status', 'Menu item ditambahkan. Jangan lupa jalankan `php artisan storage:link` jika belum.');
     }
 
     public function destroy(MenuItem $menuItem)

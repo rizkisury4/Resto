@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Admin - Orders</title>
-    <style>table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #ddd}</style>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
+    <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
 <body>
     <h2>Admin POS Dashboard</h2>
@@ -25,6 +26,17 @@
 
         <section style="background:#fff; border:1px solid #eee; padding:14px; border-radius:10px;">
             <h3 style="margin-top:0;">Keranjang POS</h3>
+            <div style="margin-bottom:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                @if(!empty($menuItems) && count($menuItems))
+                    @foreach($menuItems as $mi)
+                        <button type="button" class="menu-add" data-name="{{ $mi->name }}" data-price="{{ (int)$mi->price }}" style="padding:8px 10px; border-radius:8px; border:1px solid #f0f0f0; background:#fff; cursor:pointer;">{{ $mi->name }} — Rp {{ number_format($mi->price,0,',','.') }}</button>
+                    @endforeach
+                @else
+                    @foreach($menuPrices as $name => $price)
+                        <button type="button" class="menu-add" data-name="{{ $name }}" data-price="{{ $price }}" style="padding:8px 10px; border-radius:8px; border:1px solid #f0f0f0; background:#fff; cursor:pointer;">{{ $name }} — Rp {{ number_format($price,0,',','.') }}</button>
+                    @endforeach
+                @endif
+            </div>
             <form id="posForm" method="POST" action="{{ route('admin.orders.pos.create') }}">
                 @csrf
                 <div id="cartItems" style="display:grid; gap:10px;">

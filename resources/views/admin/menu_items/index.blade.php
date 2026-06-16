@@ -10,12 +10,15 @@
     <h2>Daftar Makanan</h2>
     <p><a href="{{ route('admin.dashboard') }}">Kembali</a> | <a href="{{ route('admin.logout') }}">Logout</a></p>
 
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
+    <script src="{{ asset('js/app.js') }}" defer></script>
+
     @if(session('status'))<div style="color:green">{{ session('status') }}</div>@endif
 
     <section style="display:flex; gap:18px; align-items:flex-start">
         <div style="flex:1; background:#fff; border:1px solid #eee; padding:12px; border-radius:8px;">
             <h3>Tambah Makanan</h3>
-            <form method="post" action="{{ route('admin.menu.store') }}">
+            <form method="post" action="{{ route('admin.menu.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div>
                     <label>Nama</label><br>
@@ -30,8 +33,8 @@
                     <textarea name="description" style="width:100%; padding:8px"></textarea>
                 </div>
                 <div style="margin-top:8px">
-                    <label>Image path (optional)</label><br>
-                    <input type="text" name="image_path" style="width:100%; padding:8px" />
+                    <label>Gambar Makanan (opsional, max 2MB)</label><br>
+                    <input type="file" name="image" accept="image/*" style="width:100%; padding:8px" />
                 </div>
                 <div style="margin-top:12px"><button type="submit" style="padding:8px 12px; background:#2b6f4a; color:#fff; border:none; border-radius:8px">Simpan</button></div>
             </form>
