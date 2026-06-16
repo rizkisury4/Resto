@@ -63,10 +63,20 @@ Route::post('admin/login', [AdminAuthController::class, 'login'])->name('admin.l
 Route::get('admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
 Route::middleware(['admin.auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::patch('orders/{order}', [AdminOrderController::class, 'updateStatus'])->name('orders.update');
     Route::post('orders/pos', [AdminOrderController::class, 'posCreate'])->name('orders.pos.create');
     Route::get('orders/{order}/receipt', [AdminOrderController::class, 'receipt'])->name('orders.receipt');
+    
+    // Payments reporting / confirmation
+    Route::get('payments', [\App\Http\Controllers\AdminPaymentController::class, 'index'])->name('payments.index');
+    Route::post('payments/{order}/confirm', [\App\Http\Controllers\AdminPaymentController::class, 'confirm'])->name('payments.confirm');
+
+    // Menu management
+    Route::get('menu-items', [\App\Http\Controllers\AdminMenuController::class, 'index'])->name('menu.index');
+    Route::post('menu-items', [\App\Http\Controllers\AdminMenuController::class, 'store'])->name('menu.store');
+    Route::delete('menu-items/{menuItem}', [\App\Http\Controllers\AdminMenuController::class, 'destroy'])->name('menu.destroy');
 });
 
 // Mock payment routes for simulation

@@ -59,7 +59,13 @@ class OrderController extends Controller
             return redirect()->route('order.start');
         }
 
-        return view('menu', compact('customerContext'));
+        // load menu items from DB if available
+        $menuItems = [];
+        if (class_exists(\App\Models\MenuItem::class)) {
+            $menuItems = \App\Models\MenuItem::where('is_active', true)->orderBy('name')->get();
+        }
+
+        return view('menu', compact('customerContext', 'menuItems'));
     }
 
     public function index()
@@ -99,8 +105,17 @@ class OrderController extends Controller
                 'items' => 'required|array|min:1',
             ];
 
+            // allow menu names from DB if MenuItem model exists
+            $validNames = array_keys($this->menuPrices);
+            if (class_exists(\App\Models\MenuItem::class)) {
+                $dbNames = \App\Models\MenuItem::where('is_active', true)->pluck('name')->toArray();
+                if (! empty($dbNames)) {
+                    $validNames = $dbNames;
+                }
+            }
+
             foreach ($items as $i => $it) {
-                $rules["items.$i.item_name"] = ['required', 'string', Rule::in(array_keys($this->menuPrices))];
+                $rules["items.$i.item_name"] = ['required', 'string', Rule::in($validNames)];
                 $rules["items.$i.quantity"] = 'required|integer|min:1|max:20';
                 $rules["items.$i.notes"] = 'nullable|string|max:500';
             }
@@ -112,7 +127,13 @@ class OrderController extends Controller
             foreach ($validated['items'] as $it) {
                 $name = $it['item_name'];
                 $qty = (int) $it['quantity'];
-                $price = $this->menuPrices[$name];
+                // resolve price from DB menu if available
+                if (class_exists(\App\Models\MenuItem::class)) {
+                    $menuRow = \App\Models\MenuItem::where('name', $name)->first();
+                    $price = $menuRow ? (float) $menuRow->price : ($this->menuPrices[$name] ?? 0);
+                } else {
+                    $price = $this->menuPrices[$name] ?? 0;
+                }
                 $subtotal = $price * $qty;
                 $cleanItems[] = [
                     'item_name' => $name,
@@ -146,15 +167,28 @@ class OrderController extends Controller
         $quantity = $request->input('quantity');
         $notes = $request->input('notes');
 
+        $validNames = array_keys($this->menuPrices);
+        if (class_exists(\App\Models\MenuItem::class)) {
+            $dbNames = \App\Models\MenuItem::where('is_active', true)->pluck('name')->toArray();
+            if (! empty($dbNames)) {
+                $validNames = $dbNames;
+            }
+        }
+
         $validated = $request->validate([
-            'item_name' => ['required', 'string', Rule::in(array_keys($this->menuPrices))],
+            'item_name' => ['required', 'string', Rule::in($validNames)],
             'quantity' => 'required|integer|min:1|max:20',
             'notes' => 'nullable|string|max:500',
         ]);
 
         $item_name = $validated['item_name'];
         $quantity = $validated['quantity'];
-        $price = $this->menuPrices[$item_name];
+        if (class_exists(\App\Models\MenuItem::class)) {
+            $menuRow = \App\Models\MenuItem::where('name', $item_name)->first();
+            $price = $menuRow ? (float) $menuRow->price : ($this->menuPrices[$item_name] ?? 0);
+        } else {
+            $price = $this->menuPrices[$item_name] ?? 0;
+        }
         $total = $price * $quantity;
 
         session([
@@ -226,7 +260,7 @@ class OrderController extends Controller
             }
         } else {
             $validated = $request->validate([
-                'item_name' => ['required', 'string', Rule::in(array_keys($this->menuPrices))],
+                'item_name' => 'required|string',
                 'quantity' => 'required|integer|min:1|max:20',
                 'notes' => 'nullable|string|max:500',
                 'payment_method' => 'required|in:debit,cashier',
@@ -234,7 +268,15 @@ class OrderController extends Controller
             ]);
 
             $validated['customer_name'] = $customerContext['customer_name'];
-            $validated['total_price'] = $this->menuPrices[$validated['item_name']] * $validated['quantity'];
+            // resolve unit price from DB if MenuItem exists
+            if (class_exists(\App\Models\MenuItem::class)) {
+                $menuRow = \App\Models\MenuItem::where('name', $validated['item_name'])->first();
+                $unitPrice = $menuRow ? (float)$menuRow->price : ($this->menuPrices[$validated['item_name']] ?? 0);
+            } else {
+                $unitPrice = $this->menuPrices[$validated['item_name']] ?? 0;
+            }
+
+            $validated['total_price'] = $unitPrice * $validated['quantity'];
             $serviceLabel = $customerContext['service_type'] === 'dine_in' ? 'Makan di sini' : 'Takeaway';
             $validated['notes'] = trim($serviceLabel . ($validated['notes'] ? ' - ' . $validated['notes'] : ''));
 
@@ -244,9 +286,9 @@ class OrderController extends Controller
                 $order->items = [[
                     'item_name' => $validated['item_name'],
                     'quantity' => $validated['quantity'],
-                    'unit_price' => $this->menuPrices[$validated['item_name']],
+                    'unit_price' => $unitPrice,
                     'notes' => $validated['notes'] ?? null,
-                    'subtotal' => $validated['quantity'] * $this->menuPrices[$validated['item_name']],
+                    'subtotal' => $validated['quantity'] * $unitPrice,
                 ]];
                 $order->save();
             }

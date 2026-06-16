@@ -12,14 +12,15 @@
 
     @if(session('status'))<div style="color:green">{{ session('status') }}</div>@endif
 
-    <div style="display:grid; grid-template-columns: 340px 1fr 420px; gap:18px; align-items:start;">
+    <div style="display:grid; grid-template-columns: 220px 1fr 420px; gap:18px; align-items:start;">
         <aside style="background:#fff; border:1px solid #eee; padding:14px; border-radius:10px;">
-            <h3 style="margin-top:0;">Menu Cepat</h3>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-                @foreach($menuPrices as $name => $price)
-                    <button type="button" class="menu-add" data-name="{{ $name }}" data-price="{{ $price }}" style="text-align:left; padding:10px; border-radius:8px; border:1px solid #f0f0f0; background:#fff; cursor:pointer;">{{ $name }} — Rp {{ number_format($price,0,',','.') }}</button>
-                @endforeach
-            </div>
+            <h3 style="margin-top:0;">Navigation</h3>
+            <nav style="display:flex; flex-direction:column; gap:8px;">
+                <a href="{{ route('admin.dashboard') }}" style="display:block; padding:8px 10px; border-radius:8px; text-decoration:none; color:#333; background:#fff;">Home - Laporan Penjualan</a>
+                <a href="{{ route('admin.payments.index') }}" style="display:block; padding:8px 10px; border-radius:8px; text-decoration:none; color:#333; background:#fff;">Laporan Pembayaran</a>
+                <a href="{{ route('admin.orders.index') }}" style="display:block; padding:8px 10px; border-radius:8px; text-decoration:none; color:#333; background:#fff;">Order Makanan</a>
+                <a href="{{ route('admin.menu.index') }}" style="display:block; padding:8px 10px; border-radius:8px; text-decoration:none; color:#333; background:#fff;">Daftar Makanan</a>
+            </nav>
         </aside>
 
         <section style="background:#fff; border:1px solid #eee; padding:14px; border-radius:10px;">

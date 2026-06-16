@@ -247,89 +247,25 @@
         </header>
 
         <main class="menu-grid">
-            <article class="card">
-                <div class="image" style="background-image: url('{{ asset('images/nasi-goreng-kencur-kemangi.jpg') }}');"></div>
-                <div class="card-content">
-                    <div>
-                        <h2 class="card-title">Nasi Goreng</h2>
-                        <p class="card-text">Nasi goreng hangat dengan aroma bawang putih, kecap manis, irisan ayam, telur mata sapi, dan acar pedas yang segar.</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                        <div class="card-price">Rp 25.000</div>
-                        <button type="button" class="card-add" data-name="Nasi Goreng" data-price="25000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
-                    </div>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="image" style="background-image: url('{{ asset('images/mie-goreng-saus-tiram.jpg') }}');"></div>
-                <div class="card-content">
-                    <div>
-                        <h2 class="card-title">Mie Goreng</h2>
-                        <p class="card-text">Mie goreng spesial dengan bumbu kecap, sayuran segar, potongan ayam, dan taburan bawang goreng yang renyah.</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                        <div class="card-price">Rp 22.000</div>
-                        <button type="button" class="card-add" data-name="Mie Goreng" data-price="22000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
-                    </div>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="image" style="background-image: url('{{ asset('images/ayam-panggang.jpg') }}');"></div>
-                <div class="card-content">
-                    <div>
-                        <h2 class="card-title">Nasi Ayam Goreng</h2>
-                        <p class="card-text">Seporsi nasi putih hangat dengan ayam goreng kremes, sambal matah, lalapan segar, dan sayur asem.</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                        <div class="card-price">Rp 29.000</div>
-                        <button type="button" class="card-add" data-name="Nasi Ayam Goreng" data-price="29000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
-                    </div>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="image" style="background-image: url('{{ asset('images/ayam-panggang.jpg') }}');"></div>
-                <div class="card-content">
-                    <div>
-                        <h2 class="card-title">Ayam Bakar</h2>
-                        <p class="card-text">Ayam bakar manis pedas matang sempurna, disajikan dengan nasi hangat, lalapan, dan sambal terasi khas Nusantara.</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                        <div class="card-price">Rp 32.000</div>
-                        <button type="button" class="card-add" data-name="Ayam Bakar" data-price="32000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
-                    </div>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="image" style="background-image: url('{{ asset('images/ayam-geprek.webp') }}');"></div>
-                <div class="card-content">
-                    <div>
-                        <h2 class="card-title">Ayam Geprek</h2>
-                        <p class="card-text">Ayam goreng tepung digeprek dengan sambal cabai rawit, keju, dan kecap manis, cocok untuk pencinta rasa pedas.</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                        <div class="card-price">Rp 28.000</div>
-                        <button type="button" class="card-add" data-name="Ayam Geprek" data-price="28000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
-                    </div>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="image" style="background-image: url('{{ asset('images/sate-ayam.jpg') }}');"></div>
-                <div class="card-content">
-                    <div>
-                        <h2 class="card-title">Sate Ayam</h2>
-                        <p class="card-text">Sate ayam empuk dengan bumbu kacang gurih, lontong, irisan bawang merah, dan sambal kecap original.</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                        <div class="card-price">Rp 26.000</div>
-                        <button type="button" class="card-add" data-name="Sate Ayam" data-price="26000" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
-                    </div>
-                </div>
-            </article>
+            @if(!empty($menuItems) && count($menuItems))
+                @foreach($menuItems as $m)
+                    <article class="card">
+                        <div class="image" style="background-image: url('{{ $m->image_path ? asset($m->image_path) : asset('images/default-food.jpg') }}');"></div>
+                        <div class="card-content">
+                            <div>
+                                <h2 class="card-title">{{ $m->name }}</h2>
+                                <p class="card-text">{{ $m->description }}</p>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                                <div class="card-price">Rp {{ number_format($m->price,0,',','.') }}</div>
+                                <button type="button" class="card-add" data-name="{{ $m->name }}" data-price="{{ (int) $m->price }}" style="padding:8px 12px; border-radius:12px; border:none; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Tambah</button>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            @else
+                <div style="grid-column:1/-1; padding:24px; background:#fff; border-radius:12px; text-align:center;">Tidak ada menu terdaftar. Admin dapat menambahkan menu pada halaman <a href="{{ route('admin.menu.index') }}">Daftar Makanan</a>.</div>
+            @endif
         </main>
 
         <section style="background: rgba(181, 63, 46, 0.06); border: 1px solid rgba(181, 63, 46, 0.14); border-radius: 24px; padding: 24px; margin-top: 12px;">

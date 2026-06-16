@@ -30,6 +30,22 @@ class AdminOrderController extends Controller
             'Sate Ayam' => 9,
         ];
 
+        // if MenuItem model exists, override prices with DB values and also prepare quick-add buttons from DB
+        $menuItems = [];
+        if (class_exists(\App\Models\MenuItem::class)) {
+            $menuItems = \App\Models\MenuItem::where('is_active', true)->orderBy('name')->get();
+            if ($menuItems->count()) {
+                $menuPrices = [];
+                foreach ($menuItems as $mi) {
+                    $menuPrices[$mi->name] = (int)$mi->price;
+                    // keep a simple default prep time if missing
+                    if (! isset($menuPrep[$mi->name])) {
+                        $menuPrep[$mi->name] = 8;
+                    }
+                }
+            }
+        }
+
         $orders = Order::orderBy('created_at', 'desc')->get();
 
         // annotate orders with estimate ready time (ETA)
@@ -94,6 +110,7 @@ class AdminOrderController extends Controller
 
     public function posCreate(Request $request)
     {
+        // build menuPrices from DB if available, otherwise fallback to defaults
         $menuPrices = [
             'Nasi Goreng' => 25000,
             'Mie Goreng' => 22000,
@@ -102,6 +119,15 @@ class AdminOrderController extends Controller
             'Ayam Geprek' => 28000,
             'Sate Ayam' => 26000,
         ];
+        if (class_exists(\App\Models\MenuItem::class)) {
+            $menuItems = \App\Models\MenuItem::where('is_active', true)->get();
+            if ($menuItems->count()) {
+                $menuPrices = [];
+                foreach ($menuItems as $mi) {
+                    $menuPrices[$mi->name] = (int)$mi->price;
+                }
+            }
+        }
 
         $request->validate([
             'items' => 'required|array|min:1',
