@@ -10,12 +10,12 @@ class MenuItemSeeder extends Seeder
     public function run(): void
     {
         $items = [
-            ['name' => 'Nasi Goreng', 'description' => 'Nasi goreng spesial', 'price' => 25000],
-            ['name' => 'Mie Goreng', 'description' => 'Mie goreng lezat', 'price' => 22000],
-            ['name' => 'Nasi Ayam Goreng', 'description' => 'Ayam goreng kremes', 'price' => 29000],
-            ['name' => 'Ayam Bakar', 'description' => 'Ayam bakar bumbu manis', 'price' => 32000],
-            ['name' => 'Ayam Geprek', 'description' => 'Ayam geprek pedas', 'price' => 28000],
-            ['name' => 'Sate Ayam', 'description' => 'Sate ayam bumbu kacang', 'price' => 26000],
+            ['name' => 'Nasi Goreng',      'description' => 'Nasi goreng spesial kencur dan kemangi', 'price' => 25000, 'image_path' => 'images/nasi-goreng-kencur-kemangi.jpg'],
+            ['name' => 'Mie Goreng',       'description' => 'Mie goreng saus tiram lezat',            'price' => 22000, 'image_path' => 'images/mie-goreng-saus-tiram.jpg'],
+            ['name' => 'Nasi Ayam Goreng', 'description' => 'Ayam goreng kremes dengan nasi hangat',  'price' => 29000, 'image_path' => null],
+            ['name' => 'Ayam Bakar',       'description' => 'Ayam bakar bumbu manis panggang',        'price' => 32000, 'image_path' => 'images/ayam-panggang.jpg'],
+            ['name' => 'Ayam Geprek',      'description' => 'Ayam geprek sambel pedas mantap',        'price' => 28000, 'image_path' => 'images/ayam-geprek.webp'],
+            ['name' => 'Sate Ayam',        'description' => 'Sate ayam bumbu kacang gurih',           'price' => 26000, 'image_path' => 'images/sate-ayam.jpg'],
         ];
 
         foreach ($items as $it) {
