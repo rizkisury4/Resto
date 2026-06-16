@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class AdminOrderController extends Controller
 {
@@ -126,17 +127,25 @@ class AdminOrderController extends Controller
         $serviceLabel = 'POS Sale';
         $notes = $serviceLabel . ' - ' . implode(' ; ', $notesParts);
 
-        $order = Order::create([
+        $orderAttributes = [
             'item_name' => count($items) > 1 ? 'Beberapa item' : $items[0]['item_name'],
             'quantity' => $totalQty,
             'customer_name' => 'POS',
             'notes' => $notes,
-            'items' => $items,
             'payment_method' => $request->input('payment_method'),
             'status' => $request->input('payment_method') === 'cashier' ? 'paid' : 'pending_payment',
-            'cashier_name' => auth()->user()->name ?? null,
             'total_price' => $total,
-        ]);
+        ];
+
+        if (Schema::hasColumn('orders', 'items')) {
+            $orderAttributes['items'] = $items;
+        }
+
+        if (Schema::hasColumn('orders', 'cashier_name')) {
+            $orderAttributes['cashier_name'] = auth()->user()->name ?? null;
+        }
+
+        $order = Order::create($orderAttributes);
 
         return redirect()->route('admin.orders.index')->with('status', 'POS order created (ID: '.$order->id.')');
     }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->enum('payment_method', ['debit', 'cashier'])->default('cashier');
-            $table->enum('status', ['pending', 'paid', 'completed'])->default('pending');
+            $table->string('status')->default('pending');
             $table->decimal('total_price', 10, 2)->nullable();
         });
     }

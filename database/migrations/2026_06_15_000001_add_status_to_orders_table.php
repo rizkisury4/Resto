@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -15,6 +16,8 @@ return new class extends Migration
             Schema::table('orders', function (Blueprint $table) {
                 $table->string('status')->default('pending')->after('notes');
             });
+        } else {
+            DB::statement("ALTER TABLE `orders` MODIFY COLUMN `status` VARCHAR(255) NOT NULL DEFAULT 'pending'");
         }
     }
 

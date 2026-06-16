@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
@@ -204,17 +205,22 @@ class OrderController extends Controller
 
             $notesText = $serviceLabel . ' - ' . implode(' ; ', $notesParts);
 
-            $order = Order::create([
+            $orderAttributes = [
                 'item_name' => count($items) > 1 ? 'Beberapa item' : $items[0]['item_name'],
                 'quantity' => array_sum(array_column($items, 'quantity')),
                 'customer_name' => $customerContext['customer_name'],
                 'notes' => $notesText,
-                'items' => $items,
                 'payment_method' => $request->input('payment_method'),
                 'total_price' => $totalPrice,
-            ]);
+            ];
+
+            if (Schema::hasColumn('orders', 'items')) {
+                $orderAttributes['items'] = $items;
+            }
+
+            $order = Order::create($orderAttributes);
             // if a cashier created this (admin POS) allow recording cashier_name via request
-            if ($request->filled('cashier_name')) {
+            if ($request->filled('cashier_name') && Schema::hasColumn('orders', 'cashier_name')) {
                 $order->cashier_name = $request->input('cashier_name');
                 $order->save();
             }
@@ -234,14 +240,16 @@ class OrderController extends Controller
 
             $order = Order::create($validated);
             // ensure single-item orders also store items array for consistency
-            $order->items = [[
-                'item_name' => $validated['item_name'],
-                'quantity' => $validated['quantity'],
-                'unit_price' => $this->menuPrices[$validated['item_name']],
-                'notes' => $validated['notes'] ?? null,
-                'subtotal' => $validated['quantity'] * $this->menuPrices[$validated['item_name']],
-            ]];
-            $order->save();
+            if (Schema::hasColumn('orders', 'items')) {
+                $order->items = [[
+                    'item_name' => $validated['item_name'],
+                    'quantity' => $validated['quantity'],
+                    'unit_price' => $this->menuPrices[$validated['item_name']],
+                    'notes' => $validated['notes'] ?? null,
+                    'subtotal' => $validated['quantity'] * $this->menuPrices[$validated['item_name']],
+                ]];
+                $order->save();
+            }
         }
 
         // set status depending on payment method
