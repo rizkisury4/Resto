@@ -65,6 +65,7 @@ Route::get('admin/logout', [AdminAuthController::class, 'logout'])->name('admin.
 Route::middleware(['admin.auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::patch('orders/{order}', [AdminOrderController::class, 'updateStatus'])->name('orders.update');
+    Route::post('orders/pos', [AdminOrderController::class, 'posCreate'])->name('orders.pos.create');
 });
 
 // Mock payment routes for simulation

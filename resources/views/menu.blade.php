@@ -324,27 +324,45 @@
 
             <form action="{{ route('order.checkout') }}" method="POST" style="display:grid; gap:14px;">
                 @csrf
-                <label style="display:block; font-weight:700; color:#5a4d45;">
-                    Pilih Menu
-                    <select name="item_name" required style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;">
-                        <option value="Nasi Goreng">Nasi Goreng - Rp 25.000</option>
-                        <option value="Mie Goreng">Mie Goreng - Rp 22.000</option>
-                        <option value="Nasi Ayam Goreng">Nasi Ayam Goreng - Rp 29.000</option>
-                        <option value="Ayam Bakar">Ayam Bakar - Rp 32.000</option>
-                        <option value="Ayam Geprek">Ayam Geprek - Rp 28.000</option>
-                        <option value="Sate Ayam">Sate Ayam - Rp 26.000</option>
-                    </select>
-                </label>
 
-                <label style="display:block; font-weight:700; color:#5a4d45;">
-                    Jumlah
-                    <input type="number" name="quantity" min="1" max="20" value="1" required style="width:120px; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;" />
-                </label>
+                <div id="itemsContainer" style="display:grid; gap:12px;">
+                    <template id="itemRowTemplate">
+                        <div class="item-row" style="display:flex; gap:12px; align-items:flex-start;">
+                            <div style="flex:1;">
+                                <label style="display:block; font-weight:700; color:#5a4d45;">Pilih Menu
+                                    <select name="items[INDEX][item_name]" required style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;">
+                                        <option value="Nasi Goreng">Nasi Goreng - Rp 25.000</option>
+                                        <option value="Mie Goreng">Mie Goreng - Rp 22.000</option>
+                                        <option value="Nasi Ayam Goreng">Nasi Ayam Goreng - Rp 29.000</option>
+                                        <option value="Ayam Bakar">Ayam Bakar - Rp 32.000</option>
+                                        <option value="Ayam Geprek">Ayam Geprek - Rp 28.000</option>
+                                        <option value="Sate Ayam">Sate Ayam - Rp 26.000</option>
+                                    </select>
+                                </label>
+                            </div>
 
-                <label style="display:block; font-weight:700; color:#5a4d45;">
-                    Catatan (opsional)
-                    <textarea name="notes" rows="3" style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;">{{ old('notes') }}</textarea>
-                </label>
+                            <div style="width:120px;">
+                                <label style="display:block; font-weight:700; color:#5a4d45;">Jumlah
+                                    <input type="number" name="items[INDEX][quantity]" min="1" max="20" value="1" required style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;" />
+                                </label>
+                            </div>
+
+                            <div style="width:40px; display:flex; align-items:center;">
+                                <button type="button" class="remove-item" style="margin-top:26px; background:transparent; border:none; color:#b53f2e; font-weight:700; cursor:pointer;">Hapus</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display:block; font-weight:700; color:#5a4d45;">Catatan (opsional)
+                                <textarea name="items[INDEX][notes]" rows="2" style="width:100%; padding:12px 14px; margin-top:6px; border:1px solid #dcd6d2; border-radius:12px;"></textarea>
+                            </label>
+                        </div>
+                    </template>
+                </div>
+
+                <div style="display:flex; gap:8px;">
+                    <button type="button" id="addItemBtn" style="padding:10px 14px; border:1px solid rgba(181,63,46,0.24); border-radius:999px; background:#fff8f2; color:#8f2f1d; font-weight:700; cursor:pointer;">+ Tambah Item</button>
+                    <span style="align-self:center; color:#6d6057;">Tambah beberapa jenis makanan sebelum checkout.</span>
+                </div>
 
                 @if ($errors->any())
                     <div style="color:#8f2f1d; background:#fff1f0; border:1px solid #f1c6be; border-radius:14px; padding:14px;">
@@ -357,9 +375,38 @@
                     </div>
                 @endif
 
-                <button type="submit" style="align-self:flex-start; padding:14px 24px; border:none; border-radius:14px; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Lanjut ke Pembayaran</button>
-                <a href="{{ route('order.index') }}" style="display:inline-block; margin-top:6px; color:#b53f2e;">Lihat daftar pesanan</a>
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <button type="submit" style="align-self:flex-start; padding:14px 24px; border:none; border-radius:14px; background:#b53f2e; color:#fff; font-weight:700; cursor:pointer;">Lanjut ke Pembayaran</button>
+                    <a href="{{ route('order.index') }}" style="display:inline-block; margin-top:6px; color:#b53f2e;">Lihat daftar pesanan</a>
+                </div>
             </form>
+
+            <script>
+                (function(){
+                    const tpl = document.getElementById('itemRowTemplate').innerHTML;
+                    const container = document.getElementById('itemsContainer');
+                    const addBtn = document.getElementById('addItemBtn');
+                    let idx = 0;
+
+                    function addRow(data) {
+                        let html = tpl.replace(/INDEX/g, idx);
+                        const wrapper = document.createElement('div');
+                        wrapper.innerHTML = html;
+                        // attach remove handler
+                        wrapper.querySelectorAll('.remove-item').forEach(function(btn){
+                            btn.addEventListener('click', function(){
+                                wrapper.remove();
+                            });
+                        });
+                        container.appendChild(wrapper);
+                        idx++;
+                    }
+
+                    // initialize with one row
+                    addBtn.addEventListener('click', function(){ addRow(); });
+                    addRow();
+                })();
+            </script>
         </section>
 
         <footer>

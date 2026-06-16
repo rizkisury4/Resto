@@ -153,30 +153,46 @@
 
         <div class="checkout-box">
             <div class="order-summary">
-                <div class="summary-row">
-                    <span>Menu:</span>
-                    <strong>{{ $item_name }}</strong>
-                </div>
-                <div class="summary-row">
-                    <span>Jumlah:</span>
-                    <strong>{{ $quantity }} Porsi</strong>
-                </div>
-                @if ($customer_name)
+                @if (!empty($items))
+                    @foreach ($items as $it)
+                        <div class="summary-row">
+                            <span>{{ $it['item_name'] }}</span>
+                            <strong>{{ $it['quantity'] }} x Rp {{ number_format($it['unit_price'], 0, ',', '.') }} = Rp {{ number_format($it['subtotal'], 0, ',', '.') }}</strong>
+                        </div>
+                        @if (!empty($it['notes']))
+                            <div class="summary-row">
+                                <span>Catatan:</span>
+                                <strong>{{ $it['notes'] }}</strong>
+                            </div>
+                        @endif
+                    @endforeach
+                @else
                     <div class="summary-row">
-                        <span>Nama:</span>
-                        <strong>{{ $customer_name }}</strong>
+                        <span>Menu:</span>
+                        <strong>{{ $item_name }}</strong>
                     </div>
-                @endif
-                <div class="summary-row">
-                    <span>Tipe Pesanan:</span>
-                    <strong>{{ $service_type === 'dine_in' ? 'Makan di sini' : 'Takeaway' }}</strong>
-                </div>
-                @if ($notes)
                     <div class="summary-row">
-                        <span>Catatan:</span>
-                        <strong>{{ $notes }}</strong>
+                        <span>Jumlah:</span>
+                        <strong>{{ $quantity }} Porsi</strong>
                     </div>
+                    @if ($customer_name)
+                        <div class="summary-row">
+                            <span>Nama:</span>
+                            <strong>{{ $customer_name }}</strong>
+                        </div>
+                    @endif
+                    <div class="summary-row">
+                        <span>Tipe Pesanan:</span>
+                        <strong>{{ $service_type === 'dine_in' ? 'Makan di sini' : 'Takeaway' }}</strong>
+                    </div>
+                    @if ($notes)
+                        <div class="summary-row">
+                            <span>Catatan:</span>
+                            <strong>{{ $notes }}</strong>
+                        </div>
+                    @endif
                 @endif
+
                 <div class="summary-row total">
                     <span>Total Harga:</span>
                     <span>Rp {{ number_format($total_price, 0, ',', '.') }}</span>
@@ -185,11 +201,8 @@
 
             <form action="{{ route('order.store') }}" method="POST">
                 @csrf
-                <input type="hidden" name="item_name" value="{{ $item_name }}" />
-                <input type="hidden" name="quantity" value="{{ $quantity }}" />
-                <input type="hidden" name="customer_name" value="{{ $customer_name }}" />
-                <input type="hidden" name="service_type" value="{{ $service_type }}" />
-                <input type="hidden" name="notes" value="{{ $notes }}" />
+                <input type="hidden" name="customer_name" value="{{ $customer_name ?? '' }}" />
+                <input type="hidden" name="service_type" value="{{ $service_type ?? '' }}" />
                 <input type="hidden" name="total_price" value="{{ $total_price }}" />
 
                 <div class="payment-section">

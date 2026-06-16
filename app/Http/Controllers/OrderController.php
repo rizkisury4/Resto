@@ -87,10 +87,62 @@ class OrderController extends Controller
             return redirect()->route('order.start');
         }
 
-        $item_name = $request->input('item_name');
-        $quantity = $request->input('quantity');
         $customer_name = $customerContext['customer_name'];
         $service_type = $customerContext['service_type'];
+
+        // Support both single-item form (legacy) and multi-item 'items' array
+        if ($request->has('items')) {
+            $items = $request->input('items');
+
+            $rules = [
+                'items' => 'required|array|min:1',
+            ];
+
+            foreach ($items as $i => $it) {
+                $rules["items.$i.item_name"] = ['required', 'string', Rule::in(array_keys($this->menuPrices))];
+                $rules["items.$i.quantity"] = 'required|integer|min:1|max:20';
+                $rules["items.$i.notes"] = 'nullable|string|max:500';
+            }
+
+            $validated = $request->validate($rules);
+
+            $cleanItems = [];
+            $total = 0;
+            foreach ($validated['items'] as $it) {
+                $name = $it['item_name'];
+                $qty = (int) $it['quantity'];
+                $price = $this->menuPrices[$name];
+                $subtotal = $price * $qty;
+                $cleanItems[] = [
+                    'item_name' => $name,
+                    'quantity' => $qty,
+                    'unit_price' => $price,
+                    'notes' => $it['notes'] ?? null,
+                    'subtotal' => $subtotal,
+                ];
+                $total += $subtotal;
+            }
+
+            session([
+                'order_data' => [
+                    'items' => $cleanItems,
+                    'customer_name' => $customer_name,
+                    'service_type' => $service_type,
+                    'total_price' => $total,
+                ]
+            ]);
+
+            return view('checkout', [
+                'items' => $cleanItems,
+                'customer_name' => $customer_name,
+                'service_type' => $service_type,
+                'total_price' => $total,
+            ]);
+        }
+
+        // Legacy single-item handling
+        $item_name = $request->input('item_name');
+        $quantity = $request->input('quantity');
         $notes = $request->input('notes');
 
         $validated = $request->validate([
@@ -133,29 +185,58 @@ class OrderController extends Controller
             return redirect()->route('order.start');
         }
 
-        $validated = $request->validate([
-            'item_name' => ['required', 'string', Rule::in(array_keys($this->menuPrices))],
-            'quantity' => 'required|integer|min:1|max:20',
-            'notes' => 'nullable|string|max:500',
-            'payment_method' => 'required|in:debit,cashier',
-            'total_price' => 'required|numeric|min:1000',
-        ]);
+        // If checkout used multi-item cart, use session data
+        $orderData = session('order_data');
 
-        $validated['customer_name'] = $customerContext['customer_name'];
-        $validated['total_price'] = $this->menuPrices[$validated['item_name']] * $validated['quantity'];
-        $serviceLabel = $customerContext['service_type'] === 'dine_in' ? 'Makan di sini' : 'Takeaway';
-        $validated['notes'] = trim($serviceLabel . ($validated['notes'] ? ' - ' . $validated['notes'] : ''));
+        if (! empty($orderData) && ! empty($orderData['items'])) {
+            $request->validate([
+                'payment_method' => 'required|in:debit,cashier',
+            ]);
 
-        $order = Order::create($validated);
+            $items = $orderData['items'];
+            $totalPrice = $orderData['total_price'] ?? 0;
+            $serviceLabel = $customerContext['service_type'] === 'dine_in' ? 'Makan di sini' : 'Takeaway';
+
+            $notesParts = [];
+            foreach ($items as $it) {
+                $notesParts[] = $it['item_name'] . ' x' . $it['quantity'] . ($it['notes'] ? ' (' . $it['notes'] . ')' : '');
+            }
+
+            $notesText = $serviceLabel . ' - ' . implode(' ; ', $notesParts);
+
+            $order = Order::create([
+                'item_name' => count($items) > 1 ? 'Beberapa item' : $items[0]['item_name'],
+                'quantity' => array_sum(array_column($items, 'quantity')),
+                'customer_name' => $customerContext['customer_name'],
+                'notes' => $notesText,
+                'payment_method' => $request->input('payment_method'),
+                'total_price' => $totalPrice,
+            ]);
+        } else {
+            $validated = $request->validate([
+                'item_name' => ['required', 'string', Rule::in(array_keys($this->menuPrices))],
+                'quantity' => 'required|integer|min:1|max:20',
+                'notes' => 'nullable|string|max:500',
+                'payment_method' => 'required|in:debit,cashier',
+                'total_price' => 'required|numeric|min:1000',
+            ]);
+
+            $validated['customer_name'] = $customerContext['customer_name'];
+            $validated['total_price'] = $this->menuPrices[$validated['item_name']] * $validated['quantity'];
+            $serviceLabel = $customerContext['service_type'] === 'dine_in' ? 'Makan di sini' : 'Takeaway';
+            $validated['notes'] = trim($serviceLabel . ($validated['notes'] ? ' - ' . $validated['notes'] : ''));
+
+            $order = Order::create($validated);
+        }
 
         // set status depending on payment method
-        if ($validated['payment_method'] === 'debit') {
-            // requires payment confirmation (simulate gateway)
+        $paymentMethod = $request->input('payment_method');
+        if ($paymentMethod === 'debit') {
             $order->status = 'pending_payment';
         } else {
             $order->status = 'pending';
         }
-        $order->total_price = $validated['total_price'];
+        // total_price already set on create
         $order->save();
 
         session()->forget('order_data');
