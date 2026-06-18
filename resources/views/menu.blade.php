@@ -220,7 +220,84 @@
             opacity: 0.65;
             cursor: wait;
         }
+        .cart-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: center;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.74);
+            border: 1px solid rgba(181, 63, 46, 0.16);
+            border-radius: 18px;
+        }
+        .cart-item-name {
+            font-weight: 700;
+            color: #2d2a26;
+        }
+        .cart-item-price {
+            margin-top: 4px;
+            font-size: 0.95rem;
+            color: #6d6057;
+        }
+        .cart-side {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .cart-qty {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px;
+            border: 1px solid rgba(181, 63, 46, 0.2);
+            border-radius: 14px;
+            background: #fff;
+        }
+        .cart-qty-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(181, 63, 46, 0.28);
+            border-radius: 10px;
+            background: #fff8f2;
+            color: #8f2f1d;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        .cart-qty-input {
+            width: 56px;
+            text-align: center;
+            padding: 8px 6px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font: inherit;
+        }
+        .cart-total {
+            min-width: 124px;
+            text-align: right;
+            font-weight: 800;
+            color: #2d2a26;
+        }
+        .cart-remove {
+            border: none;
+            background: transparent;
+            color: #b53f2e;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 8px 4px;
+        }
         @media (max-width: 520px) {
+            .cart-row {
+                grid-template-columns: 1fr;
+            }
+            .cart-side {
+                justify-content: space-between;
+            }
+            .cart-total {
+                min-width: 0;
+                text-align: left;
+            }
             .chatbot-toggle {
                 right: 16px;
                 bottom: 16px;
@@ -307,21 +384,20 @@
                         let total = 0;
                         cart.forEach((it, idx)=>{
                             const row = document.createElement('div');
-                            row.style.display='grid'; row.style.gridTemplateColumns='1fr 120px 80px'; row.style.gap='8px'; row.style.alignItems='center';
+                            row.className = 'cart-row';
                             row.innerHTML = `
                                 <div>
-                                    <div style="font-weight:700">${it.item_name}</div>
-                                    <div style="font-size:0.9rem;color:#666">${formatRupiah(it.unit_price)}</div>
-                                    <div style="margin-top:6px;"><textarea data-idx="${idx}" class="note-box" rows="2" placeholder="Catatan (opsional)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px">${it.notes||''}</textarea></div>
+                                    <div class="cart-item-name">${it.item_name}</div>
+                                    <div class="cart-item-price">${formatRupiah(it.unit_price)}</div>
                                 </div>
-                                <div style="display:flex; align-items:center; gap:6px;">
-                                    <button type="button" class="dec-btn" data-idx="${idx}" style="padding:6px 8px;">-</button>
-                                    <input type="number" class="qty-input" data-idx="${idx}" value="${it.quantity}" min="1" style="width:60px; text-align:center; padding:6px; border-radius:8px; border:1px solid #ddd" />
-                                    <button type="button" class="inc-btn" data-idx="${idx}" style="padding:6px 8px;">+</button>
-                                </div>
-                                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-                                    <div style="font-weight:700">${formatRupiah(it.unit_price * it.quantity)}</div>
-                                    <div><button type="button" class="remove-btn" data-idx="${idx}" style="background:transparent;border:none;color:#b53f2e;cursor:pointer">Hapus</button></div>
+                                <div class="cart-side">
+                                    <div class="cart-qty">
+                                        <button type="button" class="dec-btn cart-qty-btn" data-idx="${idx}" aria-label="Kurangi jumlah">-</button>
+                                        <input type="number" class="qty-input cart-qty-input" data-idx="${idx}" value="${it.quantity}" min="1" aria-label="Jumlah pesanan" />
+                                        <button type="button" class="inc-btn cart-qty-btn" data-idx="${idx}" aria-label="Tambah jumlah">+</button>
+                                    </div>
+                                    <div class="cart-total">${formatRupiah(it.unit_price * it.quantity)}</div>
+                                    <button type="button" class="remove-btn cart-remove" data-idx="${idx}">Hapus</button>
                                 </div>
                             `;
                             cartDisplay.appendChild(row);
@@ -336,7 +412,6 @@
                         cartDisplay.querySelectorAll('.dec-btn').forEach(b=> b.addEventListener('click', ()=>{ const i=b.dataset.idx; cart[i].quantity = Math.max(1, cart[i].quantity-1); renderCart(); }));
                         cartDisplay.querySelectorAll('.remove-btn').forEach(b=> b.addEventListener('click', ()=>{ const i=b.dataset.idx; cart.splice(i,1); renderCart(); }));
                         cartDisplay.querySelectorAll('.qty-input').forEach(inp=> inp.addEventListener('change', ()=>{ const i=inp.dataset.idx; cart[i].quantity = Math.max(1, parseInt(inp.value)||1); renderCart(); }));
-                        cartDisplay.querySelectorAll('.note-box').forEach(nb=> nb.addEventListener('input', ()=>{ const i=nb.dataset.idx; cart[i].notes = nb.value; }));
                     }
 
                     // add-to-cart from card buttons
