@@ -237,7 +237,11 @@ class OrderController extends Controller
                 $notesParts[] = $it['item_name'] . ' x' . $it['quantity'] . ($it['notes'] ? ' (' . $it['notes'] . ')' : '');
             }
 
+            $generalNotes = trim((string) $request->input('notes', ''));
             $notesText = $serviceLabel . ' - ' . implode(' ; ', $notesParts);
+            if ($generalNotes !== '') {
+                $notesText .= ' | Catatan: ' . $generalNotes;
+            }
 
             $orderAttributes = [
                 'item_name' => count($items) > 1 ? 'Beberapa item' : $items[0]['item_name'],
@@ -268,6 +272,7 @@ class OrderController extends Controller
             ]);
 
             $validated['customer_name'] = $customerContext['customer_name'];
+            $generalNotes = trim((string) $request->input('notes', ''));
             // resolve unit price from DB if MenuItem exists
             if (class_exists(\App\Models\MenuItem::class)) {
                 $menuRow = \App\Models\MenuItem::where('name', $validated['item_name'])->first();
@@ -278,7 +283,7 @@ class OrderController extends Controller
 
             $validated['total_price'] = $unitPrice * $validated['quantity'];
             $serviceLabel = $customerContext['service_type'] === 'dine_in' ? 'Makan di sini' : 'Takeaway';
-            $validated['notes'] = trim($serviceLabel . ($validated['notes'] ? ' - ' . $validated['notes'] : ''));
+            $validated['notes'] = trim($serviceLabel . ($validated['notes'] ? ' - ' . $validated['notes'] : '') . ($generalNotes !== '' ? ' | Catatan: ' . $generalNotes : ''));
 
             $order = Order::create($validated);
             // ensure single-item orders also store items array for consistency

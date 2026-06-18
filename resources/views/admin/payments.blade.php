@@ -14,13 +14,14 @@
 
     @if(session('status'))<div style="color:green">{{ session('status') }}</div>@endif
 
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th>ID</th><th>Total</th><th>Metode</th><th>Status</th><th>Aksi</th></tr></thead>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th>ID</th><th>Total</th><th>Metode</th><th>Catatan</th><th>Status</th><th>Aksi</th></tr></thead>
         <tbody>
             @foreach($pendingPayments as $p)
                 <tr>
                     <td>{{ $p->id }}</td>
                     <td>Rp {{ number_format($p->total_price,0,',','.') }}</td>
                     <td>{{ $p->payment_method }}</td>
+                    <td>{{ $p->notes ?: '-' }}</td>
                     <td>{{ $p->status }}</td>
                     <td>
                         <form method="post" action="{{ route('admin.payments.confirm', $p) }}">

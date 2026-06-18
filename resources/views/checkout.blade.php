@@ -62,6 +62,30 @@
             padding-top: 12px;
             margin-top: 12px;
         }
+        .notes-card {
+            margin-bottom: 20px;
+            padding: 16px 18px;
+            border: 1px solid rgba(181, 63, 46, 0.18);
+            border-radius: 14px;
+            background: rgba(181, 63, 46, 0.04);
+        }
+        .notes-card label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #8f2f1d;
+        }
+        .notes-card textarea {
+            width: 100%;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 80px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font: inherit;
+            color: #2d2a26;
+        }
         .payment-section h2 {
             margin: 0 0 16px;
             color: #8f2f1d;
@@ -204,6 +228,11 @@
                 <input type="hidden" name="customer_name" value="{{ $customer_name ?? '' }}" />
                 <input type="hidden" name="service_type" value="{{ $service_type ?? '' }}" />
                 <input type="hidden" name="total_price" value="{{ $total_price }}" />
+
+                <div class="notes-card">
+                    <label for="notes">Catatan Pesanan (opsional)</label>
+                    <textarea name="notes" id="notes" placeholder="Contoh: jangan terlalu pedas, bawa di take away, dll.">{{ old('notes', $notes ?? '') }}</textarea>
+                </div>
 
                 <div class="payment-section">
                     <h2>Pilih Metode Pembayaran</h2>
