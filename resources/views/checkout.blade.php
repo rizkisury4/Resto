@@ -39,28 +39,26 @@
             padding: 28px;
             box-shadow: 0 20px 50px rgba(181, 63, 46, 0.12);
         }
-        .order-summary {
-            padding: 18px;
+        .summary-card {
+            padding: 16px 18px;
             background: rgba(181, 63, 46, 0.08);
+            border: 1px solid rgba(181, 63, 46, 0.14);
             border-radius: 14px;
-            margin-bottom: 24px;
+            margin-bottom: 18px;
         }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
+        .summary-card .label {
+            font-size: 0.92rem;
+            color: #6d6057;
+            margin-bottom: 4px;
         }
-        .summary-row strong {
-            color: #2d2a26;
-        }
-        .summary-row.total {
-            font-size: 1.3rem;
-            font-weight: 700;
+        .summary-card .price {
+            font-size: 1.25rem;
+            font-weight: 800;
             color: #b53f2e;
-            border-top: 1px solid rgba(181, 63, 46, 0.3);
-            padding-top: 12px;
-            margin-top: 12px;
+        }
+        form {
+            display: grid;
+            gap: 18px;
         }
         .notes-card {
             margin-bottom: 20px;
@@ -163,9 +161,6 @@
         .btn-secondary:hover {
             background: #c9c1bb;
         }
-        form {
-            display: contents;
-        }
     </style>
 </head>
 <body>
@@ -176,51 +171,9 @@
         </header>
 
         <div class="checkout-box">
-            <div class="order-summary">
-                @if (!empty($items))
-                    @foreach ($items as $it)
-                        <div class="summary-row">
-                            <span>{{ $it['item_name'] }}</span>
-                            <strong>{{ $it['quantity'] }} x Rp {{ number_format($it['unit_price'], 0, ',', '.') }} = Rp {{ number_format($it['subtotal'], 0, ',', '.') }}</strong>
-                        </div>
-                        @if (!empty($it['notes']))
-                            <div class="summary-row">
-                                <span>Catatan:</span>
-                                <strong>{{ $it['notes'] }}</strong>
-                            </div>
-                        @endif
-                    @endforeach
-                @else
-                    <div class="summary-row">
-                        <span>Menu:</span>
-                        <strong>{{ $item_name }}</strong>
-                    </div>
-                    <div class="summary-row">
-                        <span>Jumlah:</span>
-                        <strong>{{ $quantity }} Porsi</strong>
-                    </div>
-                    @if ($customer_name)
-                        <div class="summary-row">
-                            <span>Nama:</span>
-                            <strong>{{ $customer_name }}</strong>
-                        </div>
-                    @endif
-                    <div class="summary-row">
-                        <span>Tipe Pesanan:</span>
-                        <strong>{{ $service_type === 'dine_in' ? 'Makan di sini' : 'Takeaway' }}</strong>
-                    </div>
-                    @if ($notes)
-                        <div class="summary-row">
-                            <span>Catatan:</span>
-                            <strong>{{ $notes }}</strong>
-                        </div>
-                    @endif
-                @endif
-
-                <div class="summary-row total">
-                    <span>Total Harga:</span>
-                    <span>Rp {{ number_format($total_price, 0, ',', '.') }}</span>
-                </div>
+            <div class="summary-card">
+                <div class="label">Total Pembayaran</div>
+                <div class="price">Rp {{ number_format($total_price, 0, ',', '.') }}</div>
             </div>
 
             <form action="{{ route('order.store') }}" method="POST">
